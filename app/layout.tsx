@@ -11,8 +11,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang='en'>
-      <body>{children}</body>
+    <html style={{ width: '100dvw', height: '100dvh', overflow: 'hidden' }} lang='en'>
+      <body style={{ width: '100dvw', height: '100dvh' }}>{children}</body>
     </html>
   )
 }
