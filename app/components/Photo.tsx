@@ -148,12 +148,11 @@ export default function Photo({id, url, position: initialPosition }: { id: strin
       onPointerOut={() => setHover(false)}
       renderOrder={active ? 1000 : 0}
     >
-      {/* Frame 
+      {/* Frame */}
       <mesh position={[0, 0, -0.01]}>
         <planeGeometry args={[width + 0.1, height + 0.1]} />
-        <meshBasicMaterial color="white" />
+        <meshBasicMaterial color="#bfb6a9" />
       </mesh>
-        */}
         
       {/* Photo */}
       <mesh>

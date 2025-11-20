@@ -14,7 +14,7 @@ function CanvasComponent() {
 export default CanvasComponent
 
 function InnerCanvas() {
-  const texture = useTexture('/Background.jpg')
+  const texture = useTexture('/Background.png')
   const { camera } = useThree() as { camera: THREE.PerspectiveCamera }
   const planeZ = -5
 
