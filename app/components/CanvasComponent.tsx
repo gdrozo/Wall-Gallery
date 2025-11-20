@@ -5,7 +5,7 @@ import Gallery from './Gallery'
 
 function CanvasComponent() {
   return (
-    <Canvas>
+    <Canvas shadows>
       <InnerCanvas />
     </Canvas>
   )
@@ -45,13 +45,13 @@ function InnerCanvas() {
   return (
     <>
       <ambientLight intensity={0.5} />
-      <pointLight position={[50, 0, 5]} />
+      <pointLight position={[50, 0, 5]} castShadow />
 
-      <directionalLight color="red" position={[0, 0, 5]} />
+      <directionalLight color="white" position={[0, 0, 5]} />
       {/* background wall */}
-      <mesh position={[0, 0, planeZ]}>
+      <mesh position={[0, 0, planeZ]} receiveShadow>
         <planeGeometry args={[planeWidth, planeHeight]} />
-        <meshBasicMaterial map={texture} />
+        <meshStandardMaterial map={texture} />
       </mesh>
 
       <Gallery />

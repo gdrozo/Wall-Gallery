@@ -25,6 +25,47 @@ export default function Photo({id, url, position: initialPosition }: { id: strin
   const dragOffset = useRef(new THREE.Vector3())
   const hasDragged = useRef(false)
 
+  // Generate random deformation parameters once
+  const curveParams = useMemo(() => ({
+    k1: (Math.random() - 0.5) * 1.5,
+    k2: (Math.random() - 0.5) * 1.5,
+    off: Math.random() * Math.PI * 2,
+    amp: Math.random() * 0.1 + 0.03
+  }), [])
+
+  const deform = (x: number, y: number) => {
+    return Math.sin(x * curveParams.k1 + y * curveParams.k2 + curveParams.off) * curveParams.amp
+  }
+
+  const photoGeometry = useMemo(() => {
+    const geo = new THREE.PlaneGeometry(width, height, 32, 32)
+    const pos = geo.attributes.position
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i)
+      const y = pos.getY(i)
+      const z = deform(x, y)
+      pos.setZ(i, z)
+    }
+    geo.computeVertexNormals()
+    return geo
+  }, [width, height, curveParams])
+
+  const frameGeometry = useMemo(() => {
+    const geo = new THREE.PlaneGeometry(width + 0.1, height + 0.1, 32, 32)
+    const pos = geo.attributes.position
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i)
+      const y = pos.getY(i)
+      const z = deform(x, y)
+      pos.setZ(i, z)
+    }
+    geo.computeVertexNormals()
+    return geo
+  }, [width, height, curveParams])
+
+  // Calculate thumbtack Z position at (0, 1)
+  const thumbtackZ = useMemo(() => deform(0, 1), [curveParams])
+
   useCursor(dragging || hovered, dragging ? 'grabbing' : 'grab', 'auto')
 
   useLayoutEffect(() => {
@@ -41,7 +82,7 @@ export default function Photo({id, url, position: initialPosition }: { id: strin
     if (active) {
         // Target: World [0, 0, 3.5] -> Local [0, -1, 8.4]
         // We use a fixed target that puts the photo in front of the camera
-        const targetPos = new THREE.Vector3(0, -1, 8.4)
+        const targetPos = new THREE.Vector3(0, -1, 7.4)
         
         // Calculate scale to fit viewport
         const targetWorldPos = new THREE.Vector3(0, 0, 3.5)
@@ -149,24 +190,23 @@ export default function Photo({id, url, position: initialPosition }: { id: strin
       renderOrder={active ? 1000 : 0}
     >
       {/* Frame */}
-      <mesh position={[0, 0, -0.01]}>
-        <planeGeometry args={[width + 0.1, height + 0.1]} />
-        <meshBasicMaterial color="#bfb6a9" />
+      <mesh position={[0, 0, -0.01]} geometry={frameGeometry} receiveShadow castShadow>
+        <meshStandardMaterial color="#bfb6a9" />
       </mesh>
         
       {/* Photo */}
-      <mesh>
-        <planeGeometry args={[width, height]} />
-        <meshBasicMaterial map={texture} />
+      <mesh geometry={photoGeometry} receiveShadow castShadow>
+        <meshStandardMaterial map={texture} />
       </mesh>
       
       {/* Thumbtack */}
       <primitive 
         object={thumbtack} 
-        position={[0, 1, 0]} 
+        position={[0, 1, thumbtackZ]} 
         scale={2}
         rotation={[Math.PI / 2, 0, 0]}
         castShadow
+        receiveShadow
       />
    
     </group>

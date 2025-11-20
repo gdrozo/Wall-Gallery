@@ -19,7 +19,7 @@ const GALLERY_ITEMS = [     // x,  y,  z
 
 function Gallery() {
   return (
-    <group position={[0, 1, -4.9]}> 
+    <group position={[0, 1, -4]}> 
       {GALLERY_ITEMS.map((item) => (
         <Photo 
           key={item.file} 
